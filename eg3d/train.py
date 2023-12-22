@@ -21,7 +21,7 @@ import json
 import tempfile
 import torch
 
-import dnnlib
+import eg3d.dnnlib as dnnlib
 from eg3d.training import training_loop
 from eg3d.metrics import metric_main
 from eg3d.torch_utils import training_stats
