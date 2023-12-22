@@ -20,14 +20,14 @@ classifiers = [
 # urls = { Documentation = "<<<ENTER_LINK_TO_DOCUMENTATION>>>" }
 # Main dependencies
 dependencies = [
-    "mtcnn",
-    # "Deep3DFaceRecon_pytorch",
-    "pillow",
-    "tensorflow",
-    "tqdm",
-    "wandb",
-    "lpips",
-    "imageio[ffmpeg]",
+#    "mtcnn",
+#    "Deep3DFaceRecon_pytorch",
+#    "pillow",
+#    "tensorflow",
+#    "tqdm",
+#    "wandb",
+#    "lpips",
+#    "imageio[ffmpeg]",
 ]
 
 [project.optional-dependencies]
