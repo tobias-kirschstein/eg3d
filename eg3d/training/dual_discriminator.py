@@ -13,9 +13,9 @@
 
 import numpy as np
 import torch
-from torch_utils import persistence
-from torch_utils.ops import upfirdn2d
-from training.networks_stylegan2 import DiscriminatorBlock, MappingNetwork, DiscriminatorEpilogue
+from eg3d.torch_utils import persistence
+from eg3d.torch_utils.ops import upfirdn2d
+from eg3d.training.networks_stylegan2 import DiscriminatorBlock, MappingNetwork, DiscriminatorEpilogue
 
 @persistence.persistent_class
 class SingleDiscriminator(torch.nn.Module):

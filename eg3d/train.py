@@ -24,8 +24,8 @@ import torch
 import dnnlib
 from training import training_loop
 from metrics import metric_main
-from torch_utils import training_stats
-from torch_utils import custom_ops
+from eg3d.torch_utils import training_stats
+from eg3d.torch_utils import custom_ops
 
 #----------------------------------------------------------------------------
 

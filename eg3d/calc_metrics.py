@@ -21,10 +21,10 @@ import dnnlib
 import legacy
 from metrics import metric_main
 from metrics import metric_utils
-from torch_utils import training_stats
-from torch_utils import custom_ops
-from torch_utils import misc
-from torch_utils.ops import conv2d_gradfix
+from eg3d.torch_utils import training_stats
+from eg3d.torch_utils import custom_ops
+from eg3d.torch_utils import misc
+from eg3d.torch_utils.ops import conv2d_gradfix
 
 #----------------------------------------------------------------------------
 

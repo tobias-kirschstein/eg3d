@@ -26,7 +26,7 @@ import mrcfile
 import legacy
 
 from camera_utils import LookAtPoseSampler
-from torch_utils import misc
+
 #----------------------------------------------------------------------------
 
 def layout_grid(img, grid_w=None, grid_h=1, float_to_uint8=True, chw_to_hwc=True, to_numpy=True):

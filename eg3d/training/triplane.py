@@ -9,11 +9,11 @@
 # its affiliates is strictly prohibited.
 
 import torch
-from torch_utils import persistence
-from training.networks_stylegan2 import Generator as StyleGAN2Backbone
-from training.volumetric_rendering.renderer import ImportanceRenderer
-from training.volumetric_rendering.ray_sampler import RaySampler
-import dnnlib
+from eg3d.torch_utils import persistence
+from eg3d.training.networks_stylegan2 import Generator as StyleGAN2Backbone
+from eg3d.training.volumetric_rendering.renderer import ImportanceRenderer
+from eg3d.training.volumetric_rendering.ray_sampler import RaySampler
+import eg3d.dnnlib as dnnlib
 
 @persistence.persistent_class
 class TriPlaneGenerator(torch.nn.Module):
@@ -107,7 +107,7 @@ class TriPlaneGenerator(torch.nn.Module):
         return self.synthesis(ws, c, update_emas=update_emas, neural_rendering_resolution=neural_rendering_resolution, cache_backbone=cache_backbone, use_cached_backbone=use_cached_backbone, **synthesis_kwargs)
 
 
-from training.networks_stylegan2 import FullyConnectedLayer
+from eg3d.training.networks_stylegan2 import FullyConnectedLayer
 
 class OSGDecoder(torch.nn.Module):
     def __init__(self, n_features, options):

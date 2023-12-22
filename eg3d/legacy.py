@@ -16,8 +16,9 @@ import re
 import copy
 import numpy as np
 import torch
-import dnnlib
-from torch_utils import misc
+import eg3d.dnnlib as dnnlib
+from eg3d.torch_utils import misc
+import eg3d.torch_utils as torch_utils
 
 #----------------------------------------------------------------------------
 
@@ -68,7 +69,14 @@ class _LegacyUnpickler(pickle.Unpickler):
     def find_class(self, module, name):
         if module == 'dnnlib.tflib.network' and name == 'Network':
             return _TFNetworkStub
-        return super().find_class(module, name)
+
+        try:
+            return super().find_class(module, name)
+        except ModuleNotFoundError:
+            # Introduced a proper package format with eg3d as common name.
+            # However, this breaks already pickled checkpoints.
+            # Hence, in case a module is not found during unpickling, also try to find the same module with eg3d. prefix
+            return super().find_class(f"eg3d.{module}", name)
 
 #----------------------------------------------------------------------------
 

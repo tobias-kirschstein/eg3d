@@ -19,16 +19,16 @@ import psutil
 import PIL.Image
 import numpy as np
 import torch
-import dnnlib
-from torch_utils import misc
-from torch_utils import training_stats
-from torch_utils.ops import conv2d_gradfix
-from torch_utils.ops import grid_sample_gradfix
+import eg3d.dnnlib as dnnlib
+from eg3d.torch_utils import misc
+from eg3d.torch_utils import training_stats
+from eg3d.torch_utils.ops import conv2d_gradfix
+from eg3d.torch_utils.ops import grid_sample_gradfix
 
-import legacy
-from metrics import metric_main
-from camera_utils import LookAtPoseSampler
-from training.crosssection_utils import sample_cross_section
+import eg3d.legacy as legacy
+from eg3d.metrics import metric_main
+from eg3d.camera_utils import LookAtPoseSampler
+from eg3d.training.crosssection_utils import sample_cross_section
 
 #----------------------------------------------------------------------------
 

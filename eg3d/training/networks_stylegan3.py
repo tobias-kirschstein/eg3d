@@ -15,11 +15,11 @@ import numpy as np
 import scipy.signal
 import scipy.optimize
 import torch
-from torch_utils import misc
-from torch_utils import persistence
-from torch_utils.ops import conv2d_gradfix
-from torch_utils.ops import filtered_lrelu
-from torch_utils.ops import bias_act
+from eg3d.torch_utils import misc
+from eg3d.torch_utils import persistence
+from eg3d.torch_utils.ops import conv2d_gradfix
+from eg3d.torch_utils.ops import filtered_lrelu
+from eg3d.torch_utils.ops import bias_act
 
 #----------------------------------------------------------------------------
 

@@ -17,8 +17,8 @@ import math
 import torch
 import torch.nn as nn
 
-from training.volumetric_rendering.ray_marcher import MipRayMarcher2
-from training.volumetric_rendering import math_utils
+from eg3d.training.volumetric_rendering.ray_marcher import MipRayMarcher2
+from eg3d.training.volumetric_rendering import math_utils
 
 def generate_planes():
     """

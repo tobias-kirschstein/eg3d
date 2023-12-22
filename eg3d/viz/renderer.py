@@ -16,8 +16,8 @@ import torch
 import torch.fft
 import torch.nn
 import matplotlib.cm
-import dnnlib
-from torch_utils.ops import upfirdn2d
+import eg3d.dnnlib
+from eg3d.torch_utils.ops import upfirdn2d
 import legacy # pylint: disable=import-error
 
 from camera_utils import LookAtPoseSampler
@@ -194,7 +194,7 @@ class Renderer:
         RELOAD_MODULES = False
         if RELOAD_MODULES:
             from training.triplane import TriPlaneGenerator
-            from torch_utils import misc
+            from eg3d.torch_utils import misc
             print("Reloading Modules!")
             net_new = TriPlaneGenerator(*net.init_args, **net.init_kwargs).eval().requires_grad_(False).to(self._device)
             misc.copy_params_and_buffers(net, net_new, require_all=True)

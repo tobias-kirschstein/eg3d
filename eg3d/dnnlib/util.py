@@ -250,7 +250,11 @@ def get_module_from_obj_name(obj_name: str) -> Tuple[types.ModuleType, str]:
     # try each alternative in turn
     for module_name, local_obj_name in name_pairs:
         try:
-            module = importlib.import_module(module_name) # may raise ImportError
+            try:
+                module = importlib.import_module(module_name) # may raise ImportError
+            except ImportError:
+                module = importlib.import_module(f"eg3d.{module_name}")  # may raise ImportError
+
             get_obj_from_module(module, local_obj_name) # may raise AttributeError
             return module, local_obj_name
         except:
@@ -261,8 +265,12 @@ def get_module_from_obj_name(obj_name: str) -> Tuple[types.ModuleType, str]:
         try:
             importlib.import_module(module_name) # may raise ImportError
         except ImportError:
-            if not str(sys.exc_info()[1]).startswith("No module named '" + module_name + "'"):
-                raise
+            module_name = f"eg3d.{module_name}"
+            try:
+                importlib.import_module(module_name)
+            except ImportError:
+                if not str(sys.exc_info()[1]).startswith("No module named '" + module_name + "'"):
+                    raise
 
     # maybe the requested attribute is missing?
     for module_name, local_obj_name in name_pairs:

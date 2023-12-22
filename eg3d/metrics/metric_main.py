@@ -85,6 +85,18 @@ def report_metric(result_dict, run_dir=None, snapshot_pkl=None):
 # Recommended metrics.
 
 @register_metric
+def fid100(opts):
+    opts.dataset_kwargs.update(max_size=None, xflip=False)
+    fid = frechet_inception_distance.compute_fid(opts, max_real=100, num_gen=100)
+    return dict(fid1k_full=fid)
+
+@register_metric
+def fid1k(opts):
+    opts.dataset_kwargs.update(max_size=None, xflip=False)
+    fid = frechet_inception_distance.compute_fid(opts, max_real=1000, num_gen=1000)
+    return dict(fid1k_full=fid)
+
+@register_metric
 def fid50k_full(opts):
     opts.dataset_kwargs.update(max_size=None, xflip=False)
     fid = frechet_inception_distance.compute_fid(opts, max_real=None, num_gen=50000)

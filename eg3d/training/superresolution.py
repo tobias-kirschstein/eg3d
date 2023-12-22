@@ -12,14 +12,14 @@
 "Efficient Geometry-aware 3D Generative Adversarial Networks"."""
 
 import torch
-from training.networks_stylegan2 import Conv2dLayer, SynthesisLayer, ToRGBLayer
-from torch_utils.ops import upfirdn2d
-from torch_utils import persistence
-from torch_utils import misc
+from eg3d.training.networks_stylegan2 import Conv2dLayer, SynthesisLayer, ToRGBLayer
+from eg3d.torch_utils.ops import upfirdn2d
+from eg3d.torch_utils import persistence
+from eg3d.torch_utils import misc
 
-from training.networks_stylegan2 import SynthesisBlock
+from eg3d.training.networks_stylegan2 import SynthesisBlock
 import numpy as np
-from training.networks_stylegan3 import SynthesisLayer as AFSynthesisLayer
+from eg3d.training.networks_stylegan3 import SynthesisLayer as AFSynthesisLayer
 
 
 #----------------------------------------------------------------------------

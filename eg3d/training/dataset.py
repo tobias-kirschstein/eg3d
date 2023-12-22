@@ -16,7 +16,7 @@ import zipfile
 import PIL.Image
 import json
 import torch
-import dnnlib
+import eg3d.dnnlib as dnnlib
 
 try:
     import pyspng

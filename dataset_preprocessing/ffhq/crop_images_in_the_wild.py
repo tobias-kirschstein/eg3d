@@ -10,7 +10,7 @@
 
 import argparse
 import os
-from preprocess import align_img
+from Deep3DFaceRecon_pytorch.util.preprocess import align_img
 from PIL import Image
 import numpy as np
 import sys

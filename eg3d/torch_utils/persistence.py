@@ -22,15 +22,29 @@ import inspect
 import copy
 import uuid
 import types
-import dnnlib
+
+import eg3d.dnnlib as dnnlib
 
 #----------------------------------------------------------------------------
 
-_version            = 6         # internal version number
-_decorators         = set()     # {decorator_class, ...}
-_import_hooks       = []        # [hook_function, ...]
-_module_to_src_dict = dict()    # {module: src, ...}
-_src_to_module_dict = dict()    # {src: module, ...}
+if __name__ == 'torch_utils.persistence':
+    # Unfortunately, this is necessary because nvidia completely overengineered with their persistence bullshit
+    # The "torch_utils.persistence" paths are hard-coded in some .pkl files (e.g., Inception network)
+    # As a result, there are two instantiations of the persistence.py module
+    # A proper one from the correct path and one from "torch_utils.persistence"
+    # This means that _module_to_src_dict and _src_to_module_dict globals will also exist twice ...
+    # The remedy here is to pull these globals from the correct module in case "torch_utils.persistence" is ever imported
+    _version = sys.modules['eg3d.torch_utils.persistence'].__dict__['_version']
+    _decorators = sys.modules['eg3d.torch_utils.persistence'].__dict__['_decorators']
+    _import_hooks = sys.modules['eg3d.torch_utils.persistence'].__dict__['_import_hooks']
+    _module_to_src_dict = sys.modules['eg3d.torch_utils.persistence'].__dict__['_module_to_src_dict']
+    _src_to_module_dict = sys.modules['eg3d.torch_utils.persistence'].__dict__['_src_to_module_dict']
+else:
+    _version            = 6         # internal version number
+    _decorators         = set()     # {decorator_class, ...}
+    _import_hooks       = []        # [hook_function, ...]
+    _module_to_src_dict = dict()    # {module: src, ...}
+    _src_to_module_dict = dict()    # {src: module, ...}
 
 #----------------------------------------------------------------------------
 
@@ -223,6 +237,9 @@ def _src_to_module(src):
         module_name = "_imported_module_" + uuid.uuid4().hex
         module = types.ModuleType(module_name)
         sys.modules[module_name] = module
+        src = src.replace("from torch_utils", "from eg3d.torch_utils")
+        src = src.replace("from training", "from eg3d.training")
+        src = src.replace("import dnnlib", "import eg3d.dnnlib as dnnlib")
         _module_to_src_dict[module] = src
         _src_to_module_dict[src] = module
         exec(src, module.__dict__) # pylint: disable=exec-used

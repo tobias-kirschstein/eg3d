@@ -17,7 +17,7 @@ import math
 import torch
 import torch.nn as nn
 
-from training.volumetric_rendering import math_utils
+from eg3d.training.volumetric_rendering import math_utils
 
 class GaussianCameraPoseSampler:
     """
