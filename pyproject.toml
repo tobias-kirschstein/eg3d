@@ -28,7 +28,6 @@ dependencies = [
     "wandb",
     "lpips",
     "imageio[ffmpeg]",
-    "git+ssh://git@github.com/tobias-kirschstein/famudy-data.git"
 ]
 
 [project.optional-dependencies]
