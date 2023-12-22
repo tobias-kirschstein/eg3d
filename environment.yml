@@ -35,4 +35,6 @@ dependencies:
     - psutil
     - mrcfile
     - tensorboard
+
     - git+ssh://git@github.com/tobias-kirschstein/famudy-data.git
+    - environs
