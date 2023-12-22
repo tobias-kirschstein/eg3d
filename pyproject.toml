@@ -21,7 +21,7 @@ classifiers = [
 # Main dependencies
 dependencies = [
     "mtcnn",
-    "Deep3DFaceRecon_pytorch",
+    # "Deep3DFaceRecon_pytorch",
     "pillow",
     "tensorflow",
     "tqdm",
