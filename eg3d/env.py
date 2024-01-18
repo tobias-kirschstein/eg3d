@@ -8,6 +8,8 @@ if env_file_path.exists():
 
 with env.prefixed("EG3D_"):
     EG3D_MODELS_PATH = env("MODELS_PATH", f"<<<Define EG3D_MODELS_PATH in {env_file_path}>>>")
+    EG3D_MODELS_PATH_REMOTE = env("MODELS_PATH_REMOTE", f"<<<Define EG3D_MODELS_PATH_REMOTE in {env_file_path}>>>")
+    EG3D_DATA_PATH = env("DATA_PATH", f"<<<Define EG3D_DATA_PATH in {env_file_path}>>>")
 
 REPO_ROOT_DIR = f"{Path(__file__).parent.resolve()}/../.."
 

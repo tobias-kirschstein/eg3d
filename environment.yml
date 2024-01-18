@@ -35,6 +35,8 @@ dependencies:
     - psutil
     - mrcfile
     - tensorboard
+    - mediapy
 
     - git+ssh://git@github.com/tobias-kirschstein/famudy-data.git
     - environs
+    - elias==0.2.11

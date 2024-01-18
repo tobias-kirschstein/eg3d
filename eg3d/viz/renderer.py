@@ -18,9 +18,9 @@ import torch.nn
 import matplotlib.cm
 import eg3d.dnnlib
 from eg3d.torch_utils.ops import upfirdn2d
-import legacy # pylint: disable=import-error
+import eg3d.legacy # pylint: disable=import-error
 
-from camera_utils import LookAtPoseSampler
+from eg3d.camera_utils import LookAtPoseSampler
 
 
 
@@ -138,7 +138,7 @@ class Renderer:
     def render(self, **args):
         self._is_timing = True
         self._start_event.record(torch.cuda.current_stream(self._device))
-        res = dnnlib.EasyDict()
+        res = eg3d.dnnlib.EasyDict()
         try:
             self._render_impl(res, **args)
         except:
@@ -161,8 +161,8 @@ class Renderer:
         if data is None:
             print(f'Loading "{pkl}"... ', end='', flush=True)
             try:
-                with dnnlib.util.open_url(pkl, verbose=False) as f:
-                    data = legacy.load_network_pkl(f)
+                with eg3d.dnnlib.util.open_url(pkl, verbose=False) as f:
+                    data = eg3d.legacy.load_network_pkl(f)
                 print('Done.')
             except:
                 data = CapturedException()
@@ -193,7 +193,7 @@ class Renderer:
 
         RELOAD_MODULES = False
         if RELOAD_MODULES:
-            from training.triplane import TriPlaneGenerator
+            from eg3d.training.triplane import TriPlaneGenerator
             from eg3d.torch_utils import misc
             print("Reloading Modules!")
             net_new = TriPlaneGenerator(*net.init_args, **net.init_kwargs).eval().requires_grad_(False).to(self._device)
@@ -332,7 +332,7 @@ class Renderer:
         w += w_avg
 
         # Run synthesis network.
-        synthesis_kwargs = dnnlib.EasyDict(noise_mode=noise_mode, force_fp32=force_fp32, cache_backbone=do_backbone_caching)
+        synthesis_kwargs = eg3d.dnnlib.EasyDict(noise_mode=noise_mode, force_fp32=force_fp32, cache_backbone=do_backbone_caching)
         torch.manual_seed(random_seed)
 
         # Set camera params
@@ -432,7 +432,7 @@ class Renderer:
                 unique_names.add(name)
                 shape = [int(x) for x in out.shape]
                 dtype = str(out.dtype).split('.')[-1]
-                layers.append(dnnlib.EasyDict(name=name, shape=shape, dtype=dtype))
+                layers.append(eg3d.dnnlib.EasyDict(name=name, shape=shape, dtype=dtype))
                 if name == capture_layer:
                     raise CaptureSuccess(out)
 

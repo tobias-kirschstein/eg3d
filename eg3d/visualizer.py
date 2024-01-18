@@ -7,6 +7,7 @@
 # disclosure or distribution of this material and related documentation
 # without an express license agreement from NVIDIA CORPORATION or
 # its affiliates is strictly prohibited.
+from pathlib import Path
 
 import click
 import os
@@ -15,6 +16,7 @@ import multiprocessing
 import numpy as np
 import imgui
 import dnnlib
+from eg3d.env import EG3D_MODELS_PATH, EG3D_MODELS_PATH_REMOTE
 from gui_utils import imgui_window
 from gui_utils import imgui_utils
 from gui_utils import gl_utils
@@ -305,7 +307,12 @@ def main(
         'https://api.ngc.nvidia.com/v2/models/nvidia/research/eg3d/versions/1/files/ffhqrebalanced512-64.pkl',
         'https://api.ngc.nvidia.com/v2/models/nvidia/research/eg3d/versions/1/files/ffhqrebalanced512-128.pkl',
         'https://api.ngc.nvidia.com/v2/models/nvidia/research/eg3d/versions/1/files/shapenetcars128-64.pkl',
+        # '//wsl.localhost/Ubuntu/mnt/rohan/cluster/doriath/tkirschstein/models/nag/EG3D/00010-ffhq-nersemble_eg3d_v0.3-gpus4-batch32-gamma1/network-snapshot-002000.pkl'
     ]
+
+    models_path = EG3D_MODELS_PATH_REMOTE
+    model_snapshot_paths = sorted([str(path) for path in Path(models_path).rglob("*.pkl")])
+    pretrained.extend(model_snapshot_paths)
 
     # Populate recent pickles list with pretrained model URLs.
     for url in pretrained:

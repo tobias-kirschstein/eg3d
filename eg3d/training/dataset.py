@@ -163,10 +163,12 @@ class ImageFolderDataset(Dataset):
     def __init__(self,
         path,                   # Path to directory or zip.
         resolution      = None, # Ensure specific resolution, None = highest available.
+        use_calibration: bool = False,
         **super_kwargs,         # Additional arguments for the Dataset base class.
     ):
         self._path = path
         self._zipfile = None
+        self._use_calibration = use_calibration
 
         if os.path.isdir(self._path):
             self._type = 'dir'
@@ -228,7 +230,10 @@ class ImageFolderDataset(Dataset):
         return image
 
     def _load_raw_labels(self):
-        fname = 'dataset.json'
+        if self._use_calibration:
+            fname = 'dataset_calibration_fitted.json'
+        else:
+            fname = 'dataset.json'
         if fname not in self._all_fnames:
             return None
         with self._open_file(fname) as f:
