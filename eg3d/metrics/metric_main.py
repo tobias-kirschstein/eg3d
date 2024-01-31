@@ -25,6 +25,7 @@ from . import inception_score
 from . import equivariance
 
 #----------------------------------------------------------------------------
+from ..training.dataset import ImageFolderDataset
 
 _metric_dict = dict() # name => fn
 
@@ -87,6 +88,7 @@ def report_metric(result_dict, run_dir=None, snapshot_pkl=None):
 @register_metric
 def fid100(opts):
     opts.dataset_kwargs.update(max_size=None, xflip=False)
+    opts.dataset = ImageFolderDataset(**opts.dataset_kwargs)
     fid = frechet_inception_distance.compute_fid(opts, max_real=100, num_gen=100)
     return dict(fid100=fid)
 

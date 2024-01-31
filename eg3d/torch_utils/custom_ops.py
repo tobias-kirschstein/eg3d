@@ -14,6 +14,7 @@ import importlib
 import os
 import re
 import shutil
+import sys
 import uuid
 
 import torch
@@ -133,10 +134,18 @@ def get_plugin(module_name, sources, headers=None, source_dir=None, **build_kwar
                     shutil.rmtree(tmpdir)
                     if not os.path.isdir(cached_build_dir): raise
 
-            # Compile.
-            cached_sources = [os.path.join(cached_build_dir, os.path.basename(fname)) for fname in sources]
-            torch.utils.cpp_extension.load(name=module_name, build_directory=cached_build_dir,
-                verbose=verbose_build, sources=cached_sources, **build_kwargs)
+            # Maybe it has already been compiled?
+            try:
+                sys.path.append(cached_build_dir)
+                importlib.import_module(module_name)
+            except ModuleNotFoundError:
+                # Compile.
+                cached_sources = [os.path.join(cached_build_dir, os.path.basename(fname)) for fname in sources]
+                torch.utils.cpp_extension.load(name=module_name, build_directory=cached_build_dir,
+                    verbose=verbose_build, sources=cached_sources, **build_kwargs)
+            finally:
+                if cached_build_dir in sys.path:
+                    sys.path.remove(cached_build_dir)
         else:
             torch.utils.cpp_extension.load(name=module_name, verbose=verbose_build, sources=sources, **build_kwargs)
 

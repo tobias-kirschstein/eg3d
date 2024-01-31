@@ -48,8 +48,18 @@ def get_feature_detector(url, device=torch.device('cpu'), num_gpus=1, rank=0, ve
         is_leader = (rank == 0)
         if not is_leader and num_gpus > 1:
             torch.distributed.barrier() # leader goes first
-        with dnnlib.util.open_url(url, verbose=(verbose and is_leader)) as f:
-            _feature_detector_cache[key] = pickle.load(f).to(device)
+        try:
+            with dnnlib.util.open_url(url, verbose=(verbose and is_leader)) as f:
+                _feature_detector_cache[key] = pickle.load(f).to(device)
+        except ImportError:
+            # Again, necessary because of nVidia's bad practice of having horrible imports
+            # Some Inception network .pkl wants to import torch_utils, which does not exist
+            # Here, create a hardcoded link to eg3d.torch_utils and try unpickling the network again
+            import eg3d.torch_utils as torch_utils
+            import sys
+            sys.modules['torch_utils'] = torch_utils
+            with dnnlib.util.open_url(url, verbose=(verbose and is_leader)) as f:
+                _feature_detector_cache[key] = pickle.load(f).to(device)
         if is_leader and num_gpus > 1:
             torch.distributed.barrier() # others follow
     return _feature_detector_cache[key]
@@ -62,7 +72,8 @@ def iterate_random_labels(opts, batch_size):
         while True:
             yield c
     else:
-        dataset = dnnlib.util.construct_class_by_name(**opts.dataset_kwargs)
+        dataset = opts.dataset
+        # dataset = dnnlib.util.construct_class_by_name(**opts.dataset_kwargs)
         while True:
             c = [dataset.get_label(np.random.randint(len(dataset))) for _i in range(batch_size)]
             c = torch.from_numpy(np.stack(c)).pin_memory().to(opts.device)
@@ -196,7 +207,8 @@ class ProgressMonitor:
 #----------------------------------------------------------------------------
 
 def compute_feature_stats_for_dataset(opts, detector_url, detector_kwargs, rel_lo=0, rel_hi=1, batch_size=64, data_loader_kwargs=None, max_items=None, **stats_kwargs):
-    dataset = dnnlib.util.construct_class_by_name(**opts.dataset_kwargs)
+    # dataset = dnnlib.util.construct_class_by_name(**opts.dataset_kwargs)
+    dataset = opts.dataset
     if data_loader_kwargs is None:
         data_loader_kwargs = dict(pin_memory=True, num_workers=3, prefetch_factor=2)
 

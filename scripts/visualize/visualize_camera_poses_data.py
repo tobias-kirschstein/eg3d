@@ -64,11 +64,11 @@ def visualize_eg3d_poses(p: pv.Plotter, archive_path: str, n_poses: int = 10, co
 
 def main():
     n_poses = 10
-    nersemble_dataset_version = 'v0.5'
+    nersemble_dataset_version = 'v0.6'
     ffhq_dataset_path = f"{EG3D_DATA_PATH}/FFHQ_png_512.zip"
 
     dataset_manager = EG3DNerRSembleDataFolder().open_dataset(nersemble_dataset_version)
-    nersemble_dataset_path  =dataset_manager.get_zip_archive_path()
+    nersemble_dataset_path = dataset_manager.get_zip_archive_path()
 
     p = pv.Plotter()
     add_coordinate_axes(p, scale=0.1)

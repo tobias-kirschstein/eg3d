@@ -9,7 +9,7 @@ from elias.config import Config
 from elias.manager import BaseDataManager
 from elias.folder.data import DataFolder
 from elias.manager.data import _SampleType
-from elias.util import load_json
+from elias.util import load_json, load_img
 from famudy.data.capture_data_processed_v2 import ImageMetadata
 
 from eg3d.env import EG3D_DATA_PATH
@@ -93,6 +93,9 @@ class EG3DNeRSembleDataManager(BaseDataManager[None, None, None]):
     def load_camera_params_fitted_processed(self, image_metadata: ImageMetadata) -> np.ndarray:
         camera_params = np.load(self.get_camera_params_fitted_processed_path(image_metadata))
         return camera_params
+
+    def load_image(self, image_metadata: ImageMetadata) -> np.ndarray:
+        return load_img(self.get_image_path(image_metadata))
 
 
 class EG3DNerRSembleDataFolder(DataFolder[EG3DNeRSembleDataManager]):
