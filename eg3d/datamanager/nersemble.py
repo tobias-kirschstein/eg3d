@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Any, Iterator, Tuple, Dict, List
 
 import numpy as np
-from dreifus.camera import PoseType
+from dreifus.camera import PoseType, CameraCoordinateConvention
 from dreifus.matrix import Intrinsics, Pose
 from dreifus.vector import Vec3
 from elias.config import Config
@@ -15,13 +15,15 @@ from famudy.data.capture_data_processed_v2 import ImageMetadata
 from eg3d.env import EG3D_DATA_PATH
 
 
-def decode_camera_params(camera_params: np.ndarray) -> Tuple[Pose, Intrinsics]:
-    pose = Pose(camera_params[:16].reshape((4, 4)), pose_type=PoseType.CAM_2_WORLD)
+def decode_camera_params(camera_params: np.ndarray, disable_rotation_check: bool = False) -> Tuple[Pose, Intrinsics]:
+    pose = Pose(camera_params[:16].reshape((4, 4)), pose_type=PoseType.CAM_2_WORLD, disable_rotation_check=disable_rotation_check)
     intrinsics = Intrinsics(camera_params[16:].reshape((3, 3)))
     return pose, intrinsics
 
 
 def encode_camera_params(pose: Pose, intrinsics: Intrinsics) -> np.ndarray:
+    pose = pose.change_pose_type(PoseType.CAM_2_WORLD, inplace=False)
+    pose = pose.change_camera_coordinate_convention(CameraCoordinateConvention.OPEN_CV, inplace=False)
     return np.concatenate([pose.flatten(), intrinsics.flatten()])
 
 
@@ -57,6 +59,10 @@ class EG3DNeRSembleDataManager(BaseDataManager[None, None, None]):
 
     def get_deep_3d_face_recon_folder(self):
         return f"{self.get_location()}/deep_3d_face_recon"
+
+    def get_deep_3d_face_recon_coefficients_path(self, image_metadata: ImageMetadata) -> str:
+        deep_3d_face_recon_name = self.get_image_name(image_metadata)
+        return f"{self.get_deep_3d_face_recon_folder()}/fitting_{deep_3d_face_recon_name}.mat"
 
     def get_image_path(self, image_metadata: ImageMetadata):
         return f"{self.get_location()}/images/{self.get_image_name(image_metadata)}.png"
@@ -97,8 +103,11 @@ class EG3DNeRSembleDataManager(BaseDataManager[None, None, None]):
     def load_image(self, image_metadata: ImageMetadata) -> np.ndarray:
         return load_img(self.get_image_path(image_metadata))
 
+    def load_detected_landmarks(self, image_metadata: ImageMetadata) -> np.ndarray:
+        return np.loadtxt(self.get_detected_landmarks_path(image_metadata))
 
-class EG3DNerRSembleDataFolder(DataFolder[EG3DNeRSembleDataManager]):
+
+class EG3DNeRSembleDataFolder(DataFolder[EG3DNeRSembleDataManager]):
 
     def __init__(self):
         super().__init__(f"{EG3D_DATA_PATH}/nersemble", localize_via_run_name=True)
