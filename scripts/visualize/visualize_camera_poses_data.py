@@ -10,7 +10,7 @@ from dreifus.pyvista import add_coordinate_axes, add_camera_frustum
 from famudy.constants import SERIALS
 from famudy.data.capture_data_processed_v2 import ImageMetadata
 
-from eg3d.datamanager.nersemble import EG3DNerRSembleDataFolder, decode_camera_params
+from eg3d.datamanager.nersemble import EG3DNeRSembleDataFolder, decode_camera_params
 from eg3d.env import EG3D_DATA_PATH
 from PIL import Image
 import pyvista as pv
@@ -67,7 +67,7 @@ def main():
     nersemble_dataset_version = 'v0.6'
     ffhq_dataset_path = f"{EG3D_DATA_PATH}/FFHQ_png_512.zip"
 
-    dataset_manager = EG3DNerRSembleDataFolder().open_dataset(nersemble_dataset_version)
+    dataset_manager = EG3DNeRSembleDataFolder().open_dataset(nersemble_dataset_version)
     nersemble_dataset_path = dataset_manager.get_zip_archive_path()
 
     p = pv.Plotter()
@@ -77,14 +77,14 @@ def main():
     visualize_eg3d_poses(p, nersemble_dataset_path, n_poses=n_poses, color='red')
     visualize_eg3d_poses(p, nersemble_dataset_path, n_poses=n_poses, color='purple', dataset_json_path='dataset_calibration_fitted.json')
 
-    # for serial in SERIALS:
-    #     image_metadata = ImageMetadata(37, "EXP-1-head", 0, serial)
-    #     camera_params = dataset_manager.load_camera_params(image_metadata)
-    #     cam_2_world_pose, intrinsics = decode_camera_params(camera_params)
-    #     add_camera_frustum(p, cam_2_world_pose, intrinsics, color='orange')
-    #
-    #     camera_params_fitted = dataset_manager.load_camera_params_fitted(image_metadata)
-    #     add_camera_frustum(p, Pose(camera_params_fitted.pose, pose_type=PoseType.CAM_2_WORLD), Intrinsics(camera_params_fitted.intrinsics), color='blue')
+    for serial in SERIALS:
+        image_metadata = ImageMetadata(37, "EXP-1-head", 0, serial)
+        camera_params = dataset_manager.load_camera_params(image_metadata)
+        cam_2_world_pose, intrinsics = decode_camera_params(camera_params)
+        add_camera_frustum(p, cam_2_world_pose, intrinsics, color='orange')
+
+        camera_params_fitted = dataset_manager.load_camera_params_fitted(image_metadata)
+        add_camera_frustum(p, Pose(camera_params_fitted.pose, pose_type=PoseType.CAM_2_WORLD), Intrinsics(camera_params_fitted.intrinsics), color='blue')
 
     p.show()
 

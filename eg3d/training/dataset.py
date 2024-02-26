@@ -16,6 +16,8 @@ import zipfile
 import PIL.Image
 import json
 import torch
+from elias.util.io import resize_img
+
 import eg3d.dnnlib as dnnlib
 
 try:
@@ -184,6 +186,7 @@ class ImageFolderDataset(Dataset):
         if len(self._image_fnames) == 0:
             raise IOError('No image files found in the specified path')
 
+        self._resolution = resolution
         name = os.path.splitext(os.path.basename(self._path))[0]
         raw_shape = [len(self._image_fnames)] + list(self._load_raw_image(0).shape)
         if resolution is not None and (raw_shape[2] != resolution or raw_shape[3] != resolution):
@@ -226,6 +229,8 @@ class ImageFolderDataset(Dataset):
                 image = np.array(PIL.Image.open(f))
         if image.ndim == 2:
             image = image[:, :, np.newaxis] # HW => HWC
+        if self._resolution is not None:
+            image = resize_img(image, self._resolution / image.shape[0])
         image = image.transpose(2, 0, 1) # HWC => CHW
         return image
 

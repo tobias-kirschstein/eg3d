@@ -89,7 +89,7 @@ class StyleGAN2Loss(Loss):
 
     def accumulate_gradients(self, phase, real_img, real_c, gen_z, gen_c, gain, cur_nimg):
         assert phase in ['Gmain', 'Greg', 'Gboth', 'Dmain', 'Dreg', 'Dboth']
-        if self.G.rendering_kwargs.get('density_reg', 0) == 0:
+        if not hasattr(self.G, 'rendering_kwargs') or self.G.rendering_kwargs.get('density_reg', 0) == 0:
             phase = {'Greg': 'none', 'Gboth': 'Gmain'}.get(phase, phase)
         if self.r1_gamma == 0:
             phase = {'Dreg': 'none', 'Dboth': 'Dmain'}.get(phase, phase)
@@ -118,11 +118,18 @@ class StyleGAN2Loss(Loss):
         # Gmain: Maximize logits for generated images.
         if phase in ['Gmain', 'Gboth']:
             with torch.autograd.profiler.record_function('Gmain_forward'):
+                # Proper adversarial loss
                 gen_img, _gen_ws = self.run_G(gen_z, gen_c, swapping_prob=swapping_prob, neural_rendering_resolution=neural_rendering_resolution)
                 gen_logits = self.run_D(gen_img, gen_c, blur_sigma=blur_sigma)
                 training_stats.report('Loss/scores/fake', gen_logits)
                 training_stats.report('Loss/signs/fake', gen_logits.sign())
                 loss_Gmain = torch.nn.functional.softplus(-gen_logits)
+
+                # TODO: Remove!!!!!!!!!
+                # L2 Reconstruction loss
+                # gen_img, _gen_ws = self.run_G(gen_z, real_c, swapping_prob=swapping_prob, neural_rendering_resolution=neural_rendering_resolution)
+                # loss_Gmain = (gen_img['image'] - real_img['image']).square().mean()
+                print(f"loss_G: {loss_Gmain.mean().item():0.3f}")
                 training_stats.report('Loss/G/loss', loss_Gmain)
             with torch.autograd.profiler.record_function('Gmain_backward'):
                 loss_Gmain.mean().mul(gain).backward()

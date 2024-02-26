@@ -20,7 +20,6 @@ from Deep3DFaceRecon_pytorch.util.preprocess import align_img
 from PIL import Image
 from mtcnn import MTCNN
 
-
 # ==========================================================
 # Poses
 # ==========================================================
@@ -227,3 +226,31 @@ def process_fitted_camera_params(camera_params_fitted: Dict[str, List[float]]) -
     processed_camera_params_fitted = np.concatenate([pose.reshape(-1), intrinsics.reshape(-1)])
 
     return processed_camera_params_fitted
+
+
+def load_bfm_vertices_with_eg3d_pose(coefficients_path: str, force_neutral: bool = False) -> np.ndarray:
+    bfm = ParametricFaceModel(bfm_folder=DEEP_3D_FACE_RECON_BFM_FOLDER)
+    bfm.to('cuda')  # Important, otherwise compute_shape() does not work
+
+    bfm_coeffs = scipy.io.loadmat(coefficients_path)
+    if force_neutral:
+        bfm_id_codes = torch.from_numpy(np.zeros_like(bfm_coeffs['id'])).cuda()
+        bfm_expr_codes = torch.from_numpy(np.zeros_like(bfm_coeffs['exp'])).cuda()
+    else:
+        bfm_id_codes = torch.from_numpy(bfm_coeffs['id']).cuda()
+        bfm_expr_codes = torch.from_numpy(bfm_coeffs['exp']).cuda()
+    bfm_vertices = bfm.compute_shape(bfm_id_codes, bfm_expr_codes)
+    bfm_vertices = bfm_vertices[0].cpu().numpy()
+
+    pose_eg3d = transform_Deep3DFaceRecon_fit(coefficients_path)['pose']
+
+    location = np.array(pose_eg3d)[:3, 3]
+    radius = np.linalg.norm(location)
+
+    # This is what we have to do to the Deep3DFaceRecon mesh to align it with the cameras from EG3D's processing
+    bfm_vertices_aligned = bfm_vertices * 0.27  # Account for c *= 0.27
+    bfm_vertices_aligned[..., 1] += 0.006  # Account for c[1] += 0.006
+    bfm_vertices_aligned[..., 2] += 0.161  # Account for c[2] += 0.161
+    bfm_vertices_aligned += (location / radius * 2.7 - location)  # Account for pose[:3, 3] = pose[:3, 3] / radius * 2.7
+
+    return bfm_vertices_aligned
