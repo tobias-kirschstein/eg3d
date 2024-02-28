@@ -129,10 +129,15 @@ class StyleGAN2Loss(Loss):
                 # L2 Reconstruction loss
                 # gen_img, _gen_ws = self.run_G(gen_z, real_c, swapping_prob=swapping_prob, neural_rendering_resolution=neural_rendering_resolution)
                 # loss_Gmain = (gen_img['image'] - real_img['image']).square().mean()
-                print(f"loss_G: {loss_Gmain.mean().item():0.3f}")
+                if loss_Gmain.isnan().any():
+                    print("loss_Gmain IS NAN!")
+                # print(f"loss_G: {loss_Gmain.mean().item():0.3f}")
                 training_stats.report('Loss/G/loss', loss_Gmain)
             with torch.autograd.profiler.record_function('Gmain_backward'):
                 loss_Gmain.mean().mul(gain).backward()
+                gradients_with_nan = [n for n,p in self.G.named_parameters() if p.grad is not None and p.grad.isnan().any()]
+                if len(gradients_with_nan) > 0:
+                    print(f"loss_Gmain NAN GRADIENTS: {gradients_with_nan}")
 
         # Density Regularization
         if phase in ['Greg', 'Gboth'] and self.G.rendering_kwargs.get('density_reg', 0) > 0 and self.G.rendering_kwargs['reg_type'] == 'l1':
@@ -255,8 +260,14 @@ class StyleGAN2Loss(Loss):
                 training_stats.report('Loss/scores/fake', gen_logits)
                 training_stats.report('Loss/signs/fake', gen_logits.sign())
                 loss_Dgen = torch.nn.functional.softplus(gen_logits)
+                if loss_Dgen.isnan().any():
+                    print("loss_Dgen IS NAN !")
             with torch.autograd.profiler.record_function('Dgen_backward'):
                 loss_Dgen.mean().mul(gain).backward()
+                gradients_with_nan = [n for n, p in self.D.named_parameters() if p.grad is not None and p.grad.isnan().any()]
+                if len(gradients_with_nan) > 0:
+                    print(f"loss_Dgen NAN GRADIENTS: {gradients_with_nan}")
+
 
         # Dmain: Maximize logits for real images.
         # Dr1: Apply R1 regularization.
@@ -274,12 +285,15 @@ class StyleGAN2Loss(Loss):
                 loss_Dreal = 0
                 if phase in ['Dmain', 'Dboth']:
                     loss_Dreal = torch.nn.functional.softplus(-real_logits)
+                    if loss_Dreal.isnan().any():
+                        print("loss_Dreal IS NAN !")
                     training_stats.report('Loss/D/loss', loss_Dgen + loss_Dreal)
 
                 loss_Dr1 = 0
                 if phase in ['Dreg', 'Dboth']:
                     if self.dual_discrimination:
                         with torch.autograd.profiler.record_function('r1_grads'), conv2d_gradfix.no_weight_gradients():
+                            # TODO: Is this used for Gaussian Discriminator? maybe dual_discrimination should be set to False
                             r1_grads = torch.autograd.grad(outputs=[real_logits.sum()], inputs=[real_img_tmp['image'], real_img_tmp['image_raw']], create_graph=True, only_inputs=True)
                             r1_grads_image = r1_grads[0]
                             r1_grads_image_raw = r1_grads[1]
@@ -295,5 +309,8 @@ class StyleGAN2Loss(Loss):
 
             with torch.autograd.profiler.record_function(name + '_backward'):
                 (loss_Dreal + loss_Dr1).mean().mul(gain).backward()
+                gradients_with_nan = [n for n, p in self.D.named_parameters() if p.grad is not None and p.grad.isnan().any()]
+                if len(gradients_with_nan) > 0:
+                    print(f"loss_Dreal NAN GRADIENTS: {gradients_with_nan}")
 
 #----------------------------------------------------------------------------
