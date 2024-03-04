@@ -12,10 +12,10 @@ import glob
 import os
 import re
 
-import dnnlib
+import eg3d.dnnlib as dnnlib
 import imgui
 import numpy as np
-from gui_utils import imgui_utils
+from eg3d.gui_utils import imgui_utils
 
 from . import renderer
 

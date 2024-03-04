@@ -313,7 +313,8 @@ class Renderer:
         forward_cam2world_pose = LookAtPoseSampler.sample(3.14/2 + conditioning_yaw, 3.14/2 + conditioning_pitch, camera_pivot, radius=camera_radius)
         intrinsics = torch.tensor([[focal_length, 0, 0.5], [0, focal_length, 0.5], [0, 0, 1]])
         conditioning_params = torch.cat([forward_cam2world_pose.reshape(16), intrinsics.reshape(9)], 0)
-        all_cs[idx, :] = conditioning_params.numpy()
+        # all_cs[idx, :] = conditioning_params.numpy()
+        all_cs[:] = conditioning_params.numpy()
 
 
         # Run mapping network.

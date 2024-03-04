@@ -11,7 +11,7 @@
 import functools
 from typing import Optional
 
-import dnnlib
+import eg3d.dnnlib as dnnlib
 import numpy as np
 import PIL.Image
 import PIL.ImageFont

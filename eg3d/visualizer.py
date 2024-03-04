@@ -15,26 +15,26 @@ import os
 import multiprocessing
 import numpy as np
 import imgui
-import dnnlib
+import eg3d.dnnlib as dnnlib
 from eg3d.env import EG3D_MODELS_PATH, EG3D_MODELS_PATH_REMOTE
-from gui_utils import imgui_window
-from gui_utils import imgui_utils
-from gui_utils import gl_utils
-from gui_utils import text_utils
-from viz import renderer
-from viz import pickle_widget
-from viz import latent_widget
-from viz import stylemix_widget
-from viz import trunc_noise_widget
-from viz import performance_widget
-from viz import capture_widget
-from viz import backbone_cache_widget
-from viz import layer_widget
-from viz import pose_widget
-from viz import zoom_widget
-from viz import conditioning_pose_widget
-from viz import render_type_widget
-from viz import render_depth_sample_widget
+from eg3d.gui_utils import imgui_window
+from eg3d.gui_utils import imgui_utils
+from eg3d.gui_utils import gl_utils
+from eg3d.gui_utils import text_utils
+from eg3d.viz import renderer
+from eg3d.viz import pickle_widget
+from eg3d.viz import latent_widget
+from eg3d.viz import stylemix_widget
+from eg3d.viz import trunc_noise_widget
+from eg3d.viz import performance_widget
+from eg3d.viz import capture_widget
+from eg3d.viz import backbone_cache_widget
+from eg3d.viz import layer_widget
+from eg3d.viz import pose_widget
+from eg3d.viz import zoom_widget
+from eg3d.viz import conditioning_pose_widget
+from eg3d.viz import render_type_widget
+from eg3d.viz import render_depth_sample_widget
 
 #----------------------------------------------------------------------------
 

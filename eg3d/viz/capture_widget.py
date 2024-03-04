@@ -13,7 +13,7 @@ import re
 import numpy as np
 import imgui
 import PIL.Image
-from gui_utils import imgui_utils
+from eg3d.gui_utils import imgui_utils
 from . import renderer
 
 #----------------------------------------------------------------------------

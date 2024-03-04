@@ -9,7 +9,7 @@
 # its affiliates is strictly prohibited.
 
 import imgui
-from gui_utils import imgui_utils
+from eg3d.gui_utils import imgui_utils
 
 #----------------------------------------------------------------------------
 

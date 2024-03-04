@@ -11,8 +11,8 @@
 from inspect import formatargvalues
 import numpy as np
 import imgui
-import dnnlib
-from gui_utils import imgui_utils
+import eg3d.dnnlib as dnnlib
+from eg3d.gui_utils import imgui_utils
 
 #----------------------------------------------------------------------------
 
