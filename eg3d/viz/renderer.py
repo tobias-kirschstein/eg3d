@@ -363,7 +363,7 @@ class Renderer:
             out, _mask = _apply_affine_transformation(out.to(torch.float32), G.synthesis.input.transform, amax=6) # Override amax to hit the fast path in upfirdn2d.
 
         # Select channels and compute statistics.
-        if type(out) == dict:
+        if isinstance(out, dict):
             # is model output. query render type
             out = out[render_type][0].to(torch.float32)
         else:
