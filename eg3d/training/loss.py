@@ -75,7 +75,10 @@ class StyleGAN2Loss(Loss):
         if blur_size > 0:
             with torch.autograd.profiler.record_function('blur'):
                 f = torch.arange(-blur_size, blur_size + 1, device=img['image'].device).div(blur_sigma).square().neg().exp2()
-                img['image'] = upfirdn2d.filter2d(img['image'], f / f.sum())
+                if self._config.blur_masks:
+                    img['image'] = upfirdn2d.filter2d(img['image'], f / f.sum())
+                else:
+                    img['image'] = torch.cat([upfirdn2d.filter2d(img['image'][:, :3], f / f.sum()), img['image'][:, 3:]], dim=1)
 
         if self.augment_pipe is not None:
             augmented_pair = self.augment_pipe(torch.cat([img['image'],
