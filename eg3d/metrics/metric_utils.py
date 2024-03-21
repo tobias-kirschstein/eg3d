@@ -285,6 +285,9 @@ def compute_feature_stats_for_generator(opts, detector_url, detector_kwargs, rel
         images = torch.cat(images)
         if images.shape[1] == 1:
             images = images.repeat([1, 3, 1, 1])
+        elif images.shape[1] > 3:
+            # Generator predicted more than 3 channels. Only use the first 3 for computing FID
+            images = images[:, :3]
         features = detector(images, **detector_kwargs)
         stats.append_torch(features, num_gpus=opts.num_gpus, rank=opts.rank)
         progress.update(stats.num_items)
