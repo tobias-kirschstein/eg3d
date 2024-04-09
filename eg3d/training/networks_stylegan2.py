@@ -576,6 +576,7 @@ class DiscriminatorBlock(torch.nn.Module):
         self.in_channels = in_channels
         self.resolution = resolution
         self.img_channels = img_channels
+        self.tmp_channels = tmp_channels
         self.first_layer_idx = first_layer_idx
         self.architecture = architecture
         self.use_fp16 = use_fp16
@@ -613,7 +614,12 @@ class DiscriminatorBlock(torch.nn.Module):
 
         # Input.
         if x is not None:
-            misc.assert_shape(x, [None, self.in_channels, self.resolution, self.resolution])
+            if self.in_channels == 0:
+                # If this is the first layer of a pre-trained discriminator, in_channels=0 but it will now actually receive an input x from on upstream
+                # discriminator block of higher resolution
+                misc.assert_shape(x, [None, self.tmp_channels, self.resolution, self.resolution])
+            else:
+                misc.assert_shape(x, [None, self.in_channels, self.resolution, self.resolution])
             x = x.to(dtype=dtype, memory_format=memory_format)
 
         # FromRGB.
