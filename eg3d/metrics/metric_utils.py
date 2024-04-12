@@ -18,6 +18,8 @@ import copy
 import uuid
 import numpy as np
 import torch
+from tqdm import tqdm
+
 import eg3d.dnnlib as dnnlib
 
 #----------------------------------------------------------------------------
@@ -212,11 +214,16 @@ def compute_feature_stats_for_dataset(opts, detector_url, detector_kwargs, rel_l
     if data_loader_kwargs is None:
         data_loader_kwargs = dict(pin_memory=True, num_workers=3, prefetch_factor=2)
 
+    # Initialize.
+    num_items = len(dataset)
+    if max_items is not None:
+        num_items = min(num_items, max_items)
+
     # Try to lookup from cache.
     cache_file = None
     if opts.cache:
         # Choose cache file name.
-        args = dict(dataset_kwargs=opts.dataset_kwargs, detector_url=detector_url, detector_kwargs=detector_kwargs, stats_kwargs=stats_kwargs)
+        args = dict(dataset_kwargs=opts.dataset_kwargs, detector_url=detector_url, detector_kwargs=detector_kwargs, stats_kwargs=stats_kwargs, num_items=num_items)
         md5 = hashlib.md5(repr(sorted(args.items())).encode('utf-8'))
         cache_tag = f'{dataset.name}-{get_feature_detector_name(detector_url)}-{md5.hexdigest()}'
         cache_file = dnnlib.make_cache_dir_path('gan-metrics', cache_tag + '.pkl')
@@ -232,10 +239,6 @@ def compute_feature_stats_for_dataset(opts, detector_url, detector_kwargs, rel_l
         if flag:
             return FeatureStats.load(cache_file)
 
-    # Initialize.
-    num_items = len(dataset)
-    if max_items is not None:
-        num_items = min(num_items, max_items)
     stats = FeatureStats(max_items=num_items, **stats_kwargs)
     progress = opts.progress.sub(tag='dataset features', num_items=num_items, rel_lo=rel_lo, rel_hi=rel_hi)
     detector = get_feature_detector(url=detector_url, device=opts.device, num_gpus=opts.num_gpus, rank=opts.rank, verbose=progress.verbose)
@@ -274,6 +277,8 @@ def compute_feature_stats_for_generator(opts, detector_url, detector_kwargs, rel
     progress = opts.progress.sub(tag='generator features', num_items=stats.max_items, rel_lo=rel_lo, rel_hi=rel_hi)
     detector = get_feature_detector(url=detector_url, device=opts.device, num_gpus=opts.num_gpus, rank=opts.rank, verbose=progress.verbose)
 
+    # tqdm_progress = tqdm(desc="Generating images for FID", total=stats.max_items)
+
     # Main loop.
     while not stats.is_full():
         images = []
@@ -282,6 +287,7 @@ def compute_feature_stats_for_generator(opts, detector_url, detector_kwargs, rel
             img = G(z=z, c=next(c_iter), **opts.G_kwargs)['image']
             img = (img * 127.5 + 128).clamp(0, 255).to(torch.uint8)
             images.append(img)
+            # tqdm_progress.update(len(img))
         images = torch.cat(images)
         if images.shape[1] == 1:
             images = images.repeat([1, 3, 1, 1])
