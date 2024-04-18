@@ -277,7 +277,7 @@ def compute_feature_stats_for_generator(opts, detector_url, detector_kwargs, rel
     progress = opts.progress.sub(tag='generator features', num_items=stats.max_items, rel_lo=rel_lo, rel_hi=rel_hi)
     detector = get_feature_detector(url=detector_url, device=opts.device, num_gpus=opts.num_gpus, rank=opts.rank, verbose=progress.verbose)
 
-    # tqdm_progress = tqdm(desc="Generating images for FID", total=stats.max_items)
+    tqdm_progress = tqdm(desc="Generating images for FID", total=stats.max_items)
 
     # Main loop.
     while not stats.is_full():
@@ -287,7 +287,7 @@ def compute_feature_stats_for_generator(opts, detector_url, detector_kwargs, rel
             img = G(z=z, c=next(c_iter), **opts.G_kwargs)['image']
             img = (img * 127.5 + 128).clamp(0, 255).to(torch.uint8)
             images.append(img)
-            # tqdm_progress.update(len(img))
+            tqdm_progress.update(len(img))
         images = torch.cat(images)
         if images.shape[1] == 1:
             images = images.repeat([1, 3, 1, 1])
