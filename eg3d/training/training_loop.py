@@ -86,12 +86,18 @@ def save_image_grid(img, fname, drange, grid_size):
     img = img.transpose(0, 3, 1, 4, 2)
     img = img.reshape([gh * H, gw * W, C])
 
-    assert C in [1, 3, 4]
+    assert C in [1, 3, 4, 6, 7]
     if C == 1:
         PIL.Image.fromarray(img[:, :, 0], 'L').save(fname)
     elif C == 3:
         PIL.Image.fromarray(img, 'RGB').save(fname)
     elif C == 4:
+        PIL.Image.fromarray(img[..., :3], 'RGB').save(fname)
+        fname_mask = f"{Path(fname).parent}/{Path(fname).stem}_mask.png"
+        PIL.Image.fromarray(img[..., 3], 'L').save(fname_mask)
+    elif C == 6:
+        PIL.Image.fromarray(img[..., :3], 'RGB').save(fname)
+    elif C == 7:
         PIL.Image.fromarray(img[..., :3], 'RGB').save(fname)
         fname_mask = f"{Path(fname).parent}/{Path(fname).stem}_mask.png"
         PIL.Image.fromarray(img[..., 3], 'L').save(fname_mask)
