@@ -4,16 +4,20 @@ from typing import Any, Iterator, Tuple, Dict, List
 import numpy as np
 from dreifus.camera import PoseType, CameraCoordinateConvention
 from dreifus.matrix import Intrinsics, Pose
-from dreifus.vector import Vec3
 from elias.config import Config
 from elias.manager import BaseDataManager
 from elias.folder.data import DataFolder
 from elias.manager.data import _SampleType
 from elias.util import load_json, load_img
-from famudy.data.capture_data_processed_v2 import ImageMetadata
 
 from eg3d.env import EG3D_DATA_PATH
 
+@dataclass
+class ImageMetadata:
+    participant_id: int
+    sequence_name: str
+    timestep: int
+    serial: str
 
 def decode_camera_params(camera_params: np.ndarray, disable_rotation_check: bool = False) -> Tuple[Pose, Intrinsics]:
     pose = Pose(camera_params[:16].reshape((4, 4)), pose_type=PoseType.CAM_2_WORLD, disable_rotation_check=disable_rotation_check)
@@ -95,6 +99,10 @@ class EG3DNeRSembleDataManager(BaseDataManager[None, None, None]):
 
     def load_camera_params_fitted(self, image_metadata: ImageMetadata) -> EG3DCameraParamsFitted:
         return EG3DCameraParamsFitted.from_json(load_json(self.get_camera_params_fitted_path(image_metadata)))
+
+    def load_camera_params_calibration_fitted(self, image_metadata: ImageMetadata) -> EG3DCameraParamsFitted:
+        pose, intrinsics = decode_camera_params(np.load(self.get_camera_params_calibration_fitted_path(image_metadata)))
+        return EG3DCameraParamsFitted(intrinsics, pose)
 
     def load_camera_params_fitted_processed(self, image_metadata: ImageMetadata) -> np.ndarray:
         camera_params = np.load(self.get_camera_params_fitted_processed_path(image_metadata))
