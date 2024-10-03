@@ -138,7 +138,7 @@ def get_plugin(module_name, sources, headers=None, source_dir=None, **build_kwar
             try:
                 sys.path.append(cached_build_dir)
                 importlib.import_module(module_name)
-            except ModuleNotFoundError:
+            except (ModuleNotFoundError, ImportError):
                 # Compile.
                 cached_sources = [os.path.join(cached_build_dir, os.path.basename(fname)) for fname in sources]
                 torch.utils.cpp_extension.load(name=module_name, build_directory=cached_build_dir,
